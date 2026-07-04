@@ -12,32 +12,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d1419; --bg2: #111c24; --bg3: #0a1217; --border: #1e3a44;
-    --accent: #4dd2c0; --accent2: #ffb84d; --accent3: #5ee68a; --red: #ff5a6e;
-    --text: #c5d4dc; --text-dim: #5a7480; --text-bright: #eaf4f8;
-    --input-bg: #0a1217; --mono: 'Share Tech Mono', monospace;
-    --sans: 'Barlow', sans-serif; --cond: 'Barlow Condensed', sans-serif;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
-    --shadow-md: 0 4px 16px rgba(0,0,0,.5);
-    --radius: 8px;
-    --radius-sm: 5px;
-    --navy: #111c24; --navy-light: #1a2a34;
-    --glass-blur: none;
+    --bg:#f3f5f8; --bg2:#ffffff; --bg3:#eceff4; --border:#e2e7ee;
+    --accent:#2f6bde; --accent2:#e8890c; --accent3:#16a34a; --red:#dc2626;
+    --c-rep:#2f6bde; --c-clear:#c026d3; --c-ctot:#d97706;
+    --text:#1b2430; --text-dim:#8a97a6; --text-bright:#0e1620;
+    --input-bg:#f7f9fc; --mono:'Share Tech Mono',monospace;
+    --sans:'Barlow',sans-serif; --cond:'Barlow Condensed',sans-serif;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+    --shadow-md:0 6px 20px rgba(16,24,40,.08);
+    --radius:14px;
+    --radius-sm:9px;
+    --navy:#2f6bde; --navy-light:#4b82e8;
+    --glass-blur:none;
+  }
+  body.dark {
+    --bg:#0f141b; --bg2:#161d27; --bg3:#121822; --border:#242f3d;
+    --accent:#6aa5f8; --accent2:#ffb84d; --accent3:#4ade80; --red:#f87171;
+    --c-rep:#6aa5f8; --c-clear:#f06ec8; --c-ctot:#fbbf24;
+    --text:#cfd9e4; --text-dim:#68788a; --text-bright:#f1f6fb;
+    --input-bg:#111823;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+    --shadow-md:0 8px 24px rgba(0,0,0,.45);
+    --navy:#1d2a3a; --navy-light:#26374c;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: #0d1419;
+    background: var(--bg);
     color: var(--text); font-family: var(--sans);
     min-height: 100vh; padding: 8px;
     -webkit-font-smoothing: antialiased;
-    position: relative;
-  }
-  body::before {
-    content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:
-      linear-gradient(rgba(77,210,192,.02) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(77,210,192,.02) 1px,transparent 1px);
-    background-size:24px 24px;
+    transition: background .3s, color .3s;
   }
 
   /* ── TABS ── */
@@ -49,18 +53,18 @@
     backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
     color: var(--text-dim); cursor: pointer; transition: all .2s;
   }
-  .tab-btn.active { background: var(--bg2); color: var(--accent2); border-color: var(--border); box-shadow: inset 0 2px 0 var(--accent2); }
+  .tab-btn.active { background: var(--bg2); color: var(--accent); border-color: var(--border); box-shadow: inset 0 2px 0 var(--accent); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
   /* ── HEADER ── */
   .app-header { text-align: center; margin-bottom: 6px; }
-  .app-header::before { content:''; display:block; width:30px; height:2px; background:var(--accent2); margin:0 auto 6px; border-radius:2px; }
+  .app-header::before { content:''; display:block; width:30px; height:2px; background:var(--accent); margin:0 auto 6px; border-radius:2px; }
   .app-title { font-family:var(--cond); font-size:18px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--text-bright); }
-  .app-title span { color:var(--accent2); }
+  .app-title span { color:var(--accent); }
   .app-subtitle { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:2px; margin-top:3px; }
   .ticker { font-family:var(--mono); font-size:9px; color:#fff; text-align:center; margin-bottom:8px; letter-spacing:1px; background:var(--bg2); max-width:960px; margin-left:auto; margin-right:auto; padding:5px 10px; border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
-  .ticker span { color:var(--accent2); }
+  .ticker span { color:var(--accent); }
 
   /* ── GRID ── */
   .main-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; max-width:960px; margin:0 auto; }
@@ -68,8 +72,8 @@
   /* ── PANELS ── */
   .panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color .2s; box-shadow:var(--shadow-md); }
   .panel:hover { border-color:var(--accent); }
-  .panel-head { display:flex; align-items:center; gap:6px; padding:6px 10px; border-bottom:1px solid var(--border); background:var(--bg3); cursor:pointer; -webkit-tap-highlight-color:transparent; box-shadow:inset 0 2px 0 rgba(255,184,77,.3); }
-  .panel-head .title { font-family:var(--cond); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent2); }
+  .panel-head { display:flex; align-items:center; gap:6px; padding:8px 12px; border-bottom:1px solid var(--border); background:var(--bg2); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .panel-head .title { font-family:var(--cond); font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--accent); }
   .panel-head .icon { font-size:12px; }
   .panel-head .collapse-arrow { margin-left:auto; font-size:9px; color:var(--text-dim); transition:transform .2s; }
   .panel-head .collapse-arrow.collapsed { transform:rotate(-90deg); }
@@ -96,7 +100,7 @@
     color:var(--text-bright); font-family:var(--mono); font-size:14px; font-weight:600;
     padding:5px 6px; width:100%; text-align:center; outline:none; transition:border-color .2s, box-shadow .2s; letter-spacing:1px;
   }
-  input[type="text"]::placeholder, input[type="number"]::placeholder { color:rgba(255,255,255,.35); }
+  input[type="text"]::placeholder, input[type="number"]::placeholder { color:var(--text-dim); opacity:.55; }
   input[type="text"]:focus, input[type="number"]:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(93,173,226,.25); background:var(--bg2); }
   input.error { border-color:var(--red); box-shadow:0 0 0 2px rgba(239,68,68,.1); }
   input.valid { border-color:var(--accent3); }
@@ -115,7 +119,8 @@
   .results-panel { grid-column:1/-1; }
   .synth-bar { display:flex; align-items:stretch; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:6px; }
   .synth-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:7px 4px; gap:2px; }
-  .synth-item.synth-main { background:var(--bg2); }
+  .synth-item.synth-main { background:rgba(47,107,222,.08); }
+  body.dark .synth-item.synth-main { background:rgba(106,165,248,.12); }
   .synth-item.delay { background:rgba(255,90,110,.28); }
   .synth-item.delay .synth-val { color:#fff !important; }
   .synth-item.delay .synth-lbl { color:var(--text-bright); }
@@ -175,13 +180,12 @@
 
   /* ── SAVE BUTTON ── */
   .btn-save {
-    background: rgba(93,173,226,.25);
+    background: var(--accent);
     border: 1px solid var(--accent); color: #fff;
     font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
     padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: all .2s;
-    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
   }
-  .btn-save:hover { background: rgba(93,173,226,.4); }
+  .btn-save:hover { background: var(--navy-light); }
   .btn-reset {
     background: var(--bg3); border: 1px solid var(--border); color: var(--text-dim);
     font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
@@ -344,7 +348,7 @@
       border:none; border-radius:0; letter-spacing:1px;
       border-top:2px solid transparent; box-shadow:none;
     }
-    .tab-btn.active { border-top-color:var(--accent2); background:var(--bg2); box-shadow:none; color:var(--accent2); }
+    .tab-btn.active { border-top-color:var(--accent); background:var(--bg2); box-shadow:none; color:var(--accent); }
     .tab-btn { display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1; }
     .tab-label { font-size:9px; letter-spacing:0.5px; }
 
@@ -706,7 +710,7 @@
 <header class="app-header">
   <div class="app-title">✈ Calculateur <span>DL</span> – Rotation</div>
 </header>
-<div class="ticker"><span style="font-size:14px;font-weight:700;color:var(--accent2);letter-spacing:2px" id="zuluVal">--:--Z</span> &nbsp;·&nbsp; LOCAL: <span id="clockVal">--:--:--</span> &nbsp;·&nbsp; <span id="sessionInfo">--</span></div>
+<div class="ticker"><span style="font-size:14px;font-weight:700;color:var(--accent);letter-spacing:2px" id="zuluVal">--:--Z</span> &nbsp;·&nbsp; LOCAL: <span id="clockVal">--:--:--</span> &nbsp;·&nbsp; <span id="sessionInfo">--</span></div>
 
 <!-- LIVE WIDGET -->
 <div class="live-widget" id="live-widget">
@@ -734,7 +738,6 @@
 <!-- TABS -->
 <div class="tabs" style="max-width:960px;margin:0 auto 0;">
   <button class="tab-btn active" onclick="switchTab('calc')">⚙️ <span class="tab-label">Calcul</span></button>
-  <button class="tab-btn" onclick="switchTab('timeline')">⏱️ <span class="tab-label">Timing</span></button>
   <button class="tab-btn" onclick="switchTab('timecalc')">🕐 <span class="tab-label">Temps</span></button>
   <button class="tab-btn" onclick="switchTab('history')">🗄️ <span class="tab-label">Hist.</span></button>
 </div>
@@ -746,7 +749,8 @@
   <div style="display:flex;gap:4px;max-width:960px;margin:0 auto 4px;align-items:center">
     <button class="preset-btn fw" id="btn-fw" onclick="toggleFirstwave()" style="font-size:11px;padding:6px 10px">🌅 First</button>
     <button class="preset-btn fw" id="btn-lw" onclick="toggleLastwave()" style="font-size:11px;padding:6px 10px">🌙 Last</button>
-    <button class="btn-reset" onclick="resetAll()" style="margin-left:auto;font-size:10px;padding:6px 12px">↺ Nouveau</button>
+    <button class="preset-btn" id="btn-theme" onclick="toggleTheme()" style="font-size:13px;padding:6px 10px;margin-left:auto" title="Mode jour/nuit">🌙</button>
+    <button class="btn-reset" onclick="resetAll()" style="font-size:10px;padding:6px 12px">↺ Nouveau</button>
   </div>
 
   <!-- PRESET BUTTONS -->
@@ -838,23 +842,15 @@
       <!-- Décomposition -->
       <div class="decomp-title">RÉPARTITION DU RETARD DÉPART</div>
       <div class="decomp-bars">
-        <div class="decomp-row"><div class="dr-label">🔄 Répercussion entrant</div><div class="dr-bar-wrap"><div class="dr-bar rep" id="bar-rep" style="width:0%"></div></div><div class="dr-val" id="val-rep" style="color:#5dade2">--</div></div>
-        <div class="decomp-row"><div class="dr-label">🛞 Clearance roulage</div><div class="dr-bar-wrap"><div class="dr-bar" id="bar-clearance" style="width:0%;background:linear-gradient(90deg,#f06ec8,#f99adb)"></div></div><div class="dr-val" id="val-clearance" style="color:#f06ec8">--</div></div>
-        <div class="decomp-row"><div class="dr-label">🕐 CTOT – Slot</div><div class="dr-bar-wrap"><div class="dr-bar ctot" id="bar-ctot" style="width:0%"></div></div><div class="dr-val" id="val-ctot" style="color:#f59e0b">--</div></div>
+        <div class="decomp-row"><div class="dr-label">🔄 Répercussion entrant</div><div class="dr-bar-wrap"><div class="dr-bar rep" id="bar-rep" style="width:0%"></div></div><div class="dr-val" id="val-rep" style="color:var(--c-rep)">--</div></div>
+        <div class="decomp-row"><div class="dr-label">🛞 Clearance roulage</div><div class="dr-bar-wrap"><div class="dr-bar" id="bar-clearance" style="width:0%;background:linear-gradient(90deg,#f06ec8,#f99adb)"></div></div><div class="dr-val" id="val-clearance" style="color:var(--c-clear)">--</div></div>
+        <div class="decomp-row"><div class="dr-label">🕐 CTOT – Slot</div><div class="dr-bar-wrap"><div class="dr-bar ctot" id="bar-ctot" style="width:0%"></div></div><div class="dr-val" id="val-ctot" style="color:var(--c-ctot)">--</div></div>
         <div class="decomp-row"><div class="dr-label" style="color:var(--red);font-weight:700">⚙️ Dépassement rotation</div><div class="dr-bar-wrap"><div class="dr-bar dep" id="bar-dep2" style="width:0%;background:linear-gradient(90deg,#ff5a6e,#ff8a98)"></div></div><div class="dr-val" id="val-dep2" style="color:var(--red)">--</div></div>
       </div>
       <!-- BILAN -->
       <div class="justify-box" id="justify-box">
         <span class="justify-text" id="justify-text">Renseignez les horaires</span>
       </div>
-    </div>
-  </div>
-
-  <!-- FRISE ROTATION -->
-  <div class="panel" style="grid-column:1/-1">
-    <div class="panel-head" onclick="togglePanel(this)"><span class="icon">📐</span><span class="title">Rotation</span><span class="collapse-arrow">▼</span></div>
-    <div class="panel-body" style="padding:4px 6px 8px">
-      <div id="rotation-timeline" style="position:relative;height:100px;margin-top:2px"></div>
     </div>
   </div>
 
@@ -867,46 +863,6 @@
 </div>
 </div><!-- end tab-calc -->
 
-<!-- ══ TAB: TIMELINE ══ -->
-<div class="tab-content" id="tab-timeline">
-<div style="max-width:960px;margin:0 auto">
-
-  <!-- Filter buttons -->
-  <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">
-    <button class="crew-cat-btn active" id="tl-filter-all" onclick="setTlFilter('all')">All</button>
-    <button class="crew-cat-btn" id="tl-filter-above" onclick="setTlFilter('above')">☝ Above</button>
-    <button class="crew-cat-btn" id="tl-filter-below" onclick="setTlFilter('below')">👇 Below</button>
-    <button class="btn-copy" onclick="addCustomMilestone()" style="margin-left:auto;font-size:9px;padding:4px 10px">＋ Action</button>
-  </div>
-
-  <!-- Above the wing -->
-  <div id="tl-section-above" style="margin-bottom:12px">
-    <div onclick="toggleTlSection('above')" style="font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bg2);padding:8px 14px;background:var(--accent);border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      ☝ ABOVE THE WING <span style="margin-left:auto;font-size:10px" id="tl-arrow-above">▼</span>
-    </div>
-    <div id="tl-list-above" style="display:flex;flex-direction:column;gap:3px"></div>
-  </div>
-
-  <!-- Below the wing -->
-  <div id="tl-section-below" style="margin-bottom:12px">
-    <div onclick="toggleTlSection('below')" style="font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bg2);padding:8px 14px;background:var(--accent2);border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      👇 BELOW THE WING <span style="margin-left:auto;font-size:10px" id="tl-arrow-below">▼</span>
-    </div>
-    <div id="tl-list-below" style="display:flex;flex-direction:column;gap:3px"></div>
-  </div>
-
-  <!-- DL Suggestions -->
-  <div class="panel" id="tl-dl-panel" style="display:none">
-    <div class="panel-head"><span class="icon">📋</span><span class="title">DL suggérés</span></div>
-    <div class="panel-body" style="padding:8px 10px">
-      <div id="tl-dl-list" style="display:flex;flex-direction:column;gap:4px"></div>
-    </div>
-  </div>
-
-  <div id="timeline-empty" style="text-align:center;padding:16px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Sélectionnez EZY ou VLY pour voir la timeline</div>
-
-</div>
-</div><!-- end tab-timeline -->
 <div class="tab-content" id="tab-timecalc">
 <div class="tc-wrap">
   <!-- Display -->
@@ -1018,11 +974,10 @@ function p2(v){ return String(v).padStart(2,'0'); }
 
 // ── TABS ──────────────────────────────────────────────────────────────
 function switchTab(name) {
-  const tabs=['calc','timeline','timecalc','history'];
+  const tabs=['calc','timecalc','history'];
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', tabs[i]===name));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active', c.id==='tab-'+name));
   if(name==='history') renderHistory();
-  if(name==='timeline') renderTimeline();
   window.scrollTo({top:0,behavior:'smooth'});
   currentTab=name;
 }
@@ -1753,8 +1708,6 @@ function calcAll(){
     if(ata===null && chronoInterval){clearInterval(chronoInterval);chronoInterval=null;document.getElementById('live-widget').classList.remove('active');}
 
     autoSave();
-    renderTimeline();
-    renderRotationTimeline();
   } catch(e){console.warn('Calc error:',e);}
 }
 
@@ -1777,7 +1730,6 @@ async function autoSave(){
       atd:document.getElementById('atd').value,
       preset:activePreset,
       acType:activeAcType,
-      crewChange:crewChange,
       firstwave:firstwave,
       lastwave:lastwave
     };
@@ -1807,7 +1759,6 @@ async function restoreCurrent(){
     if(s.preset){
       setPreset(s.preset);
       if(s.acType) setAcType(s.acType);
-      if(s.crewChange){ crewChange=true; document.getElementById('btn-crew').classList.add('active'); applyPresetValues(); }
       if(s.firstwave){ firstwave=true; document.getElementById('btn-fw').classList.add('active'); document.getElementById('panel-arr').classList.add('disabled'); }
       if(s.lastwave){ lastwave=true; document.getElementById('btn-lw').classList.add('active'); document.getElementById('panel-dep').classList.add('disabled'); }
     }
@@ -1947,7 +1898,7 @@ async function renderHistory(){
           <div class="vc-decomp-row">
             <span class="vc-decomp-lbl">Répercussion</span>
             <div class="vc-decomp-bar-wrap"><div class="vc-decomp-bar dr-bar rep" style="width:${rep/mx2*100}%"></div></div>
-            <span class="vc-decomp-val" style="color:#1e3a5f">${rep>0?'+'+rep+' m':'0 m'}</span>
+            <span class="vc-decomp-val" style="color:var(--c-rep)">${rep>0?'+'+rep+' m':'0 m'}</span>
           </div>
           <div class="vc-decomp-row">
             <span class="vc-decomp-lbl">CTOT</span>
@@ -2227,7 +2178,7 @@ function applyQuickCode(code,desc){
 // ── SWIPE BETWEEN TABS ───────────────────────────────────────────────
 let currentTab='calc';
 let touchStartX=0, touchStartY=0;
-const TAB_ORDER=['calc','timeline','timecalc','history'];
+const TAB_ORDER=['calc','timecalc','history'];
 
 document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
 document.addEventListener('touchend',e=>{
@@ -2249,445 +2200,18 @@ function togglePanel(headEl){
   if(arrow) arrow.classList.toggle('collapsed');
 }
 
-// ── ROTATION TIMELINE (frise visuelle) ───────────────────────────────
-let rotationInterval=null;
-
-function renderRotationTimeline(){
-  const container=document.getElementById('rotation-timeline');
-  if(!container) return;
-
-  const fields=[
-    {id:'sta',label:'STA',color:'#1e3a5f',type:'planned'},
-    {id:'ata',label:'ATA',color:'#2ecc71',type:'real'},
-    {id:'ado',label:'ADO',color:'#3498db',type:'real'},
-    {id:'std',label:'STD',color:'#1e3a5f',type:'planned'},
-    {id:'adct',label:'ADCT',color:'#e67e22',type:'planned'},
-    {id:'adc',label:'ADC',color:'#e67e22',type:'real'},
-    {id:'atd',label:'ATD',color:'#2ecc71',type:'real'},
-    {id:'ctot',label:'CTOT',color:'#e74c5a',type:'planned'},
-  ];
-  const ptdEl=document.getElementById('ptd-display');
-  const ptdVal=ptdEl?ptdEl.textContent:null;
-  const adctCalcEl=document.getElementById('adct-calc-display');
-  const adctCalcVisible=document.getElementById('field-adct-calc')&&document.getElementById('field-adct-calc').style.display!=='none';
-
-  const arrFields=['sta','ata','ado'];
-  const depFields=['std','adct','adc','atd','ctot'];
-
-  const points=[];
-  fields.forEach(f=>{
-    const el=document.getElementById(f.id);
-    if(!el) return;
-    // Firstwave: pas d'arrivée
-    if(firstwave && arrFields.includes(f.id)) return;
-    // Lastwave: pas de départ
-    if(lastwave && depFields.includes(f.id)) return;
-    // Si ADCT recalculé visible, remplacer l'ADCT manuel
-    if(f.id==='adct'&&adctCalcVisible&&adctCalcEl){
-      const v=parseTime(adctCalcEl.textContent);
-      if(v!==null) points.push({...f,label:'ADCT²',color:'#e74c5a',type:'computed',min:v,time:adctCalcEl.textContent});
-      return;
-    }
-    const v=parseTime(el.value);
-    if(v!==null) points.push({...f,min:v,time:el.value});
-  });
-  const ptdField=document.getElementById('field-ptd');
-  const ptdVisible=ptdField&&ptdField.style.display!=='none';
-  if(!firstwave && !lastwave && ptdVisible && ptdVal&&ptdVal!=='--:--'){
-    const v=parseTime(ptdVal);
-    if(v!==null) points.push({id:'ptd',label:'PTD',color:'#e67e22',type:'computed',min:v,time:ptdVal});
-  }
-
-  if(points.length<2){
-    container.innerHTML='<div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:20px">Min. 2 horaires pour afficher la frise</div>';
-    return;
-  }
-
-  points.sort((a,b)=>a.min-b.min);
-  const now=new Date();
-  const nowMin=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
-  // Extend range to include NOW if within 90 min of any point
-  const nearPoint=points.some(p=>Math.abs(p.min-nowMin)<=90);
-  let minT=points[0].min-3;
-  let maxT=points[points.length-1].min+3;
-  if(nearPoint){
-    minT=Math.min(minT, nowMin-2);
-    maxT=Math.max(maxT, nowMin+2);
-  }
-  const range=maxT-minT;
-  const pct=v=>((v-minT)/range*100);
-  const nowInRange=nearPoint;
-
-  const lastReal=points.filter(p=>p.type==='real').pop();
-  const progressMin=lastReal?lastReal.min:(nowInRange?nowMin:minT);
-
-  let html=`<svg viewBox="0 0 100 36" preserveAspectRatio="none" style="width:100%;height:100px;overflow:visible">`;
-  // Base line
-  html+=`<line x1="${pct(points[0].min)}" y1="20" x2="${pct(points[points.length-1].min)}" y2="20" stroke="#d4dae4" stroke-width="0.6"/>`;
-  // Progress line
-  html+=`<line x1="${pct(points[0].min)}" y1="20" x2="${pct(progressMin)}" y2="20" stroke="#2ecc71" stroke-width="1"/>`;
-
-  // Points
-  points.forEach((p,i)=>{
-    const x=pct(p.min);
-    const isReal=p.type==='real';
-    const r=isReal?1.5:1;
-    const above=i%2===0;
-    const labelY=above?10:29;
-    const timeY=above?6.5:33;
-    const tickY1=above?14:20;
-    const tickY2=above?20:26;
-
-    // Tick line
-    html+=`<line x1="${x}" y1="${tickY1}" x2="${x}" y2="${tickY2}" stroke="${p.color}" stroke-width="0.35"/>`;
-
-    if(isReal){
-      html+=`<circle cx="${x}" cy="20" r="${r}" fill="${p.color}" stroke="white" stroke-width="0.25"/>`;
-    } else {
-      html+=`<circle cx="${x}" cy="20" r="${r}" fill="white" stroke="${p.color}" stroke-width="0.3" stroke-dasharray="0.5 0.3"/>`;
-    }
-    html+=`<text x="${x}" y="${labelY}" text-anchor="middle" font-family="monospace" font-size="2.6" font-weight="700" fill="${p.color}">${p.label}</text>`;
-    html+=`<text x="${x}" y="${timeY}" text-anchor="middle" font-family="monospace" font-size="2.3" fill="${p.color}">${p.time}</text>`;
-  });
-
-  // Now cursor — masqué si ATD renseigné (rotation terminée)
-  const atdFilled=parseTime(document.getElementById('atd').value)!==null;
-  if(nowInRange&&!atdFilled){
-    const nx=pct(nowMin);
-    // Temps restant avant fermeture porte (pas en lastwave)
-    let doorTime=null;
-    if(!lastwave){
-      if(adctCalcVisible&&adctCalcEl){
-        doorTime=parseTime(adctCalcEl.textContent);
-      }
-      if(doorTime===null){
-        const adctVal=parseTime(document.getElementById('adct').value);
-        if(adctVal!==null) doorTime=adctVal;
-      }
-      if(doorTime===null){
-        const ptdDisplay2=document.getElementById('ptd-display');
-        const ptdField2=document.getElementById('field-ptd');
-        if(ptdField2&&ptdField2.style.display!=='none'&&ptdDisplay2&&ptdDisplay2.textContent!=='--:--'){
-          const ptdMin=parseTime(ptdDisplay2.textContent);
-          const m=typeof getEffectiveMarge==='function'?getEffectiveMarge():(activePreset?PRESETS[activePreset].marge:4);
-          if(ptdMin!==null) doorTime=ptdMin-m;
-        }
-      }
-    }
-    const remaining=doorTime!==null?doorTime-nowMin:null;
-    let remainTxt='';
-    if(remaining!==null){
-      const nowSec=now.getSeconds();
-      const remainSec=remaining*60-nowSec;
-      const remMinDisplay=Math.ceil(remainSec/60);
-      if(remainSec>0) remainTxt=remMinDisplay+'min';
-      else if(remainSec===0) remainTxt='NOW!';
-      else remainTxt='+'+Math.abs(Math.floor(remainSec/60))+'!';
-    }
-    const remainVal=remaining!==null?remaining*60-now.getSeconds():null;
-    const remainColor=remainVal!==null&&remainVal<=0?'#e74c5a':(remainVal!==null&&remainVal<=300?'#e67e22':'#2ecc71');
-
-    // Temps restant avant STA (pas en firstwave)
-    const staVal=parseTime(document.getElementById('sta').value);
-    let staTxt='';let staColor='#1e3a5f';
-    if(!firstwave&&staVal!==null){
-      const staRemainSec=(staVal-nowMin)*60-now.getSeconds();
-      if(staRemainSec>0){
-        const staRemMin=Math.ceil(staRemainSec/60);
-        staTxt='STA '+staRemMin+'min';
-        staColor=staRemMin<=5?'#e67e22':'#1e3a5f';
-      } else {
-        staTxt='STA passé';
-        staColor='#2ecc71';
-      }
-    }
-
-    html+=`<line x1="${nx}" y1="13" x2="${nx}" y2="27" stroke="#e74c5a" stroke-width="0.5"/>`;
-    html+=`<polygon points="${nx-0.8},13 ${nx+0.8},13 ${nx},15" fill="#e74c5a"/>`;
-    html+=`<text x="${nx}" y="11" text-anchor="middle" font-family="monospace" font-size="2" font-weight="700" fill="#e74c5a">NOW</text>`;
-    if(remainVal!==null){
-      html+=`<text x="${nx}" y="7.5" text-anchor="middle" font-family="monospace" font-size="2.4" font-weight="800" fill="${remainColor}">${remainTxt}</text>`;
-    }
-    if(staTxt){
-      html+=`<text x="${nx}" y="31" text-anchor="middle" font-family="monospace" font-size="2" font-weight="700" fill="${staColor}">${staTxt}</text>`;
-    }
-  }
-
-  html+='</svg>';
-  container.innerHTML=html;
+// ── THÈME JOUR / NUIT ─────────────────────────────────────────────────
+function applyDarkMode(dark){
+  document.body.classList.toggle('dark',dark);
+  const btn=document.getElementById('btn-theme');
+  if(btn) btn.textContent=dark?'☀️':'🌙';
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content',dark?'#0f141b':'#f3f5f8');
 }
-
-function startRotationTimer(){
-  if(rotationInterval) clearInterval(rotationInterval);
-  rotationInterval=setInterval(renderRotationTimeline,1000);
-}
-
-// ── TIMELINE ─────────────────────────────────────────────────────────
-const MILESTONES = {
-  ezy:{
-    arr:[
-      {id:'preflight',name:'Pre-Flight',endOff:-4,ref:'ata',wing:'below',dlCode:'41',dlDesc:'Late pre-flight inspection'},
-      {id:'marshaller',name:'Marshaller',endOff:-5,ref:'ata',wing:'below',dlCode:'34',dlDesc:'Late marshaller positioning'},
-      {id:'cargo-ado',name:'Cargo ADO',endOff:4,ref:'ata',wing:'below',dlCode:'34',dlDesc:'Late cargo door opening'},
-      {id:'disembark',name:'Disembark Pax',startOff:2,endOff:6,ref:'ata',wing:'above',dlCode:'66',dlDesc:'Slow disembarkation'},
-      {id:'offloading',name:'Offloading',startOff:3,endOff:8,ref:'ata',wing:'below',dlCode:'32',dlDesc:'Late offloading'},
-      {id:'bag-del',name:'Bag Delivery',endOff:12,ref:'ata',wing:'below',dlCode:'18',dlDesc:'Late bag delivery'},
-    ],
-    dep:[
-      {id:'checkin',name:'Check-In',startOff:-120,endOff:-40,ref:'std',wing:'above',dlCode:'12',dlDesc:'Late check-in'},
-      {id:'agent-gate',name:'Agent Gate',endOff:-50,ref:'std',wing:'above',dlCode:'87',dlDesc:'Late agent at gate'},
-      {id:'crew-ac',name:'Crew at A/C',endOff:-20,ref:'std',wing:'above',dlCode:'63',dlDesc:'Late crew boarding'},
-      {id:'boarding',name:'Boarding',startOff:-25,endOff:-7,ref:'std',wing:'above',dlCode:'15',dlDesc:'Late boarding'},
-      {id:'bag-ac',name:'Bag at A/C',startOff:-25,endOff:-15,ref:'std',wing:'below',dlCode:'18',dlDesc:'Late bags at aircraft'},
-      {id:'fueling',name:'Fueling',startOff:-20,endOff:-10,ref:'std',wing:'below',dlCode:'36',dlDesc:'Late fuelling'},
-      {id:'loading',name:'Loading',startOff:-15,endOff:-5,ref:'std',wing:'below',dlCode:'32',dlDesc:'Late loading'},
-      {id:'pax-ac',name:'Pax at A/C',startOff:-12,endOff:-5,ref:'std',wing:'above',dlCode:'15',dlDesc:'Late pax at aircraft'},
-      {id:'crew-ok',name:'Crew OK Board',endOff:-10,ref:'std',wing:'above',dlCode:'63',dlDesc:'Late crew OK to board'},
-      {id:'bag-search',name:'Bag Search',startOff:-8,endOff:-4,ref:'std',wing:'below',dlCode:'05',dlDesc:'Bag search / offload'},
-      {id:'pushback',name:'Pushback Rdy',startOff:-7,endOff:-3,ref:'std',wing:'below',dlCode:'34',dlDesc:'Late pushback ready'},
-      {id:'lds',name:'Final LDS',startOff:-6,endOff:-4,ref:'std',wing:'below',dlCode:'31',dlDesc:'Late loadsheet'},
-      {id:'cargo-adc',name:'Cargo ADC',endOff:-4,ref:'std',wing:'below',dlCode:'32',dlDesc:'Late cargo door closure'},
-      {id:'blockout',name:'Block Out',endOff:0,ref:'std',wing:'below',dlCode:'89',dlDesc:'Late block out'},
-    ]
-  },
-  vly:{
-    arr:[
-      {id:'preflight',name:'Pre-Flight',endOff:-4,ref:'ata',wing:'below',dlCode:'41',dlDesc:'Late pre-flight inspection'},
-      {id:'marshaller',name:'Marshaller',endOff:-5,ref:'ata',wing:'below',dlCode:'34',dlDesc:'Late marshaller positioning'},
-      {id:'cargo-ado',name:'Cargo ADO',endOff:4,ref:'ata',wing:'below',dlCode:'34',dlDesc:'Late cargo door opening'},
-      {id:'disembark',name:'Disembark Pax',startOff:2,endOff:7,ref:'ata',wing:'above',dlCode:'66',dlDesc:'Slow disembarkation'},
-      {id:'offloading',name:'Offloading',startOff:4,endOff:10,ref:'ata',wing:'below',dlCode:'32',dlDesc:'Late offloading'},
-      {id:'bag-del',name:'Bag Delivery',endOff:15,ref:'ata',wing:'below',dlCode:'18',dlDesc:'Late bag delivery'},
-    ],
-    dep:[
-      {id:'checkin',name:'Check-In',startOff:-120,endOff:-40,ref:'std',wing:'above',dlCode:'12',dlDesc:'Late check-in'},
-      {id:'agent-gate',name:'Agent Gate',endOff:-60,ref:'std',wing:'above',dlCode:'87',dlDesc:'Late agent at gate'},
-      {id:'crew-ac',name:'Crew at A/C',endOff:-25,ref:'std',wing:'above',dlCode:'63',dlDesc:'Late crew boarding'},
-      {id:'boarding',name:'Boarding',startOff:-45,endOff:-10,ref:'std',wing:'above',dlCode:'15',dlDesc:'Late boarding'},
-      {id:'bag-ac',name:'Bag at A/C',startOff:-35,endOff:-20,ref:'std',wing:'below',dlCode:'18',dlDesc:'Late bags at aircraft'},
-      {id:'fueling',name:'Fueling',startOff:-25,endOff:-15,ref:'std',wing:'below',dlCode:'36',dlDesc:'Late fuelling'},
-      {id:'loading',name:'Loading',startOff:-20,endOff:-5,ref:'std',wing:'below',dlCode:'32',dlDesc:'Late loading'},
-      {id:'pax-ac',name:'Pax at A/C',startOff:-15,endOff:-7,ref:'std',wing:'above',dlCode:'15',dlDesc:'Late pax at aircraft'},
-      {id:'crew-ok',name:'Crew OK Board',endOff:-13,ref:'std',wing:'above',dlCode:'63',dlDesc:'Late crew OK to board'},
-      {id:'bag-search',name:'Bag Search',startOff:-10,endOff:-5,ref:'std',wing:'below',dlCode:'05',dlDesc:'Bag search / offload'},
-      {id:'pushback',name:'Pushback Rdy',startOff:-10,endOff:-3,ref:'std',wing:'below',dlCode:'34',dlDesc:'Late pushback ready'},
-      {id:'lds',name:'Final LDS',startOff:-8,endOff:-5,ref:'std',wing:'below',dlCode:'31',dlDesc:'Late loadsheet'},
-      {id:'cargo-adc',name:'Cargo ADC',endOff:-4,ref:'std',wing:'below',dlCode:'32',dlDesc:'Late cargo door closure'},
-      {id:'blockout',name:'Block Out',endOff:0,ref:'std',wing:'below',dlCode:'89',dlDesc:'Late block out'},
-      {id:'other',name:'Other Service',endOff:15,ref:'std',wing:'below',dlCode:'99',dlDesc:'Other service delay'},
-    ]
-  }
-};
-
-let customMilestones=[];
-let tlRealTimes={};
-let tlAutoOverrides={};
-let tlFilter='all';
-let tlSections={above:false,below:false};
-
-function getTimelineKey(){return 'dl_tl_'+document.getElementById('vol-num').value;}
-
-function saveTlState(){
-  try{
-    const k=getTimelineKey();
-    if(k==='dl_tl_') return;
-    localStorage.setItem(k,JSON.stringify({real:tlRealTimes,auto:tlAutoOverrides,custom:customMilestones}));
-  }catch(e){}
-}
-
-function loadTlState(){
-  try{
-    const k=getTimelineKey();
-    const s=localStorage.getItem(k);
-    if(s){const d=JSON.parse(s);tlRealTimes=d.real||{};tlAutoOverrides=d.auto||{};customMilestones=d.custom||[];}
-    else{tlRealTimes={};tlAutoOverrides={};customMilestones=[];}
-  }catch(e){tlRealTimes={};tlAutoOverrides={};customMilestones=[];}
-}
-
-function scaleOff(off,baseTTM,effTTM){
-  if(Math.abs(off)>60||off===0||off===-4) return off;
-  return Math.round(off*effTTM/baseTTM);
-}
-
-function setTlFilter(f){
-  tlFilter=f;
-  document.querySelectorAll('[id^="tl-filter-"]').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('tl-filter-'+f);
-  if(btn) btn.classList.add('active');
-  if(f==='all'){tlSections.above=true;tlSections.below=true;}
-  else if(f==='above'){tlSections.above=true;tlSections.below=false;}
-  else{tlSections.above=false;tlSections.below=true;}
-  renderTimeline();
-}
-
-function toggleTlSection(sec){
-  tlSections[sec]=!tlSections[sec];
-  renderTimeline();
-}
-
-function buildRows(){
-  if(!activePreset) return [];
-  const ata=parseTime(document.getElementById('ata').value);
-  const std=parseTime(document.getElementById('std').value);
-  const p=PRESETS[activePreset];
-  const baseTTM=p.ttm;
-  const effTTM=parseInt(document.getElementById('ttm').value)||baseTTM;
-  const ms=MILESTONES[activePreset];
-  if(!ms) return [];
-  let rows=[];
-  // Firstwave: pas d'arrivée. Lastwave: pas de départ.
-  const arrMilestones=firstwave?[]:ms.arr;
-  const depMilestones=lastwave?[]:ms.dep;
-  [...arrMilestones,...depMilestones].forEach(m=>{
-    const refVal=m.ref==='ata'?ata:std;
-    let sOff=m.startOff!=null?(m.ref==='std'?scaleOff(m.startOff,baseTTM,effTTM):m.startOff):null;
-    let eOff=m.ref==='std'?scaleOff(m.endOff,baseTTM,effTTM):m.endOff;
-    let autoStart=sOff!=null&&refVal!=null?refVal+sOff:null;
-    let autoEnd=refVal!=null?refVal+eOff:null;
-    if(tlAutoOverrides[m.id+'_s']){const ov=parseTime(tlAutoOverrides[m.id+'_s']);if(ov!=null) autoStart=ov;}
-    if(tlAutoOverrides[m.id+'_e']){const ov=parseTime(tlAutoOverrides[m.id+'_e']);if(ov!=null) autoEnd=ov;}
-    const phase=m.ref==='ata'?'arr':'dep';
-    rows.push({...m,phase,autoStart,autoEnd,sortKey:autoEnd||autoStart||0});
-  });
-  customMilestones.forEach(m=>{
-    rows.push({...m,phase:'custom',wing:m.wing||'below',autoStart:null,autoEnd:null,sortKey:m.sortKey||5000,dlCode:'99',dlDesc:'Custom action'});
-  });
-  rows.sort((a,b)=>a.sortKey-b.sortKey);
-  return rows;
-}
-
-function renderMilestoneCard(m){
-  const realS=tlRealTimes[m.id+'_s']||'';
-  const realE=tlRealTimes[m.id+'_e']||'';
-  const autoSTxt=m.autoStart!=null?fmtTime(m.autoStart):'--:--';
-  const autoETxt=m.autoEnd!=null?fmtTime(m.autoEnd):'--:--';
-  const isCustom=m.phase==='custom';
-  let deltaE='';let deltaECls='';
-  if(realE&&m.autoEnd!=null){
-    const rm=parseTime(realE);
-    if(rm!=null){const d=rm-m.autoEnd;deltaE=(d>0?'+':'')+d;deltaECls=d>0?'color:var(--red)':d<0?'color:var(--accent3)':'color:var(--text-dim)';}
-  }
-  const wingColor=m.wing==='above'?'rgba(59,130,246,.04)':'rgba(245,158,11,.04)';
-  const phaseTag=m.phase==='arr'?'🛬':'🛫';
-  return `<div style="background:${wingColor};border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-family:var(--mono)">
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-      <span style="font-size:12px">${phaseTag}</span>
-      <span style="font-size:11px;font-weight:700;color:var(--text);flex:1">${m.name}</span>
-      ${deltaE?`<span style="font-size:11px;font-weight:700;${deltaECls}">${deltaE}m</span>`:''}
-      ${isCustom?`<button onclick="removeCustomMilestone('${m.id}')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:0 4px">✕</button>`:''}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-      <div style="background:var(--bg3);border-radius:4px;padding:5px 8px">
-        <div style="font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-bottom:3px">PRÉVU</div>
-        <div style="display:flex;align-items:center;gap:3px">
-          <input type="text" value="${tlAutoOverrides[m.id+'_s']||autoSTxt}" placeholder="--:--" maxlength="5" inputmode="numeric" style="font-size:12px !important;padding:2px 3px !important;min-height:24px;text-align:center;width:100%;border-radius:3px;flex:1;background:var(--bg2);border:1px dashed var(--border)" onblur="tlSetAuto('${m.id}_s',this.value)" oninput="tlAutoFmt(this)">
-          <span style="font-size:9px;color:var(--border)">→</span>
-          <input type="text" value="${tlAutoOverrides[m.id+'_e']||autoETxt}" placeholder="--:--" maxlength="5" inputmode="numeric" style="font-size:12px !important;padding:2px 3px !important;min-height:24px;text-align:center;width:100%;border-radius:3px;flex:1;background:var(--bg2);border:1px dashed var(--border)" onblur="tlSetAuto('${m.id}_e',this.value)" oninput="tlAutoFmt(this)">
-        </div>
-      </div>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:5px 8px">
-        <div style="font-size:8px;color:var(--accent);letter-spacing:1px;margin-bottom:3px">RÉEL</div>
-        <div style="display:flex;align-items:center;gap:3px">
-          <input type="text" value="${realS}" placeholder="${autoSTxt}" maxlength="5" inputmode="numeric" style="font-size:13px !important;padding:3px 4px !important;min-height:26px;text-align:center;width:100%;border-radius:4px;flex:1" onblur="tlSetReal('${m.id}_s',this.value)" oninput="tlAutoFmt(this)">
-          <span style="font-size:9px;color:var(--border)">→</span>
-          <input type="text" value="${realE}" placeholder="${autoETxt}" maxlength="5" inputmode="numeric" style="font-size:13px !important;padding:3px 4px !important;min-height:26px;text-align:center;width:100%;border-radius:4px;flex:1" onblur="tlSetReal('${m.id}_e',this.value)" oninput="tlAutoFmt(this)">
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderTimeline(){
-  const empty=document.getElementById('timeline-empty');
-  const aboveList=document.getElementById('tl-list-above');
-  const belowList=document.getElementById('tl-list-below');
-  const aboveSection=document.getElementById('tl-section-above');
-  const belowSection=document.getElementById('tl-section-below');
-  if(!empty||!aboveList||!belowList) return;
-  if(!activePreset){
-    empty.style.display='block';
-    aboveSection.style.display='none';belowSection.style.display='none';
-    document.getElementById('tl-dl-panel').style.display='none';
-    return;
-  }
-  empty.style.display='none';
-  loadTlState();
-  const rows=buildRows();
-  const aboveRows=rows.filter(m=>m.wing==='above');
-  const belowRows=rows.filter(m=>m.wing==='below');
-  aboveSection.style.display=(tlFilter==='all'||tlFilter==='above')?'block':'none';
-  belowSection.style.display=(tlFilter==='all'||tlFilter==='below')?'block':'none';
-  document.getElementById('tl-arrow-above').textContent=tlSections.above?'▼':'▶';
-  document.getElementById('tl-arrow-below').textContent=tlSections.below?'▼':'▶';
-  aboveList.style.display=tlSections.above?'flex':'none';
-  belowList.style.display=tlSections.below?'flex':'none';
-  aboveList.innerHTML=aboveRows.map(m=>renderMilestoneCard(m)).join('');
-  belowList.innerHTML=belowRows.map(m=>renderMilestoneCard(m)).join('');
-  renderDLSuggestions(rows);
-}
-
-function renderDLSuggestions(rows){
-  const panel=document.getElementById('tl-dl-panel');
-  const list=document.getElementById('tl-dl-list');
-  const suggestions=[];
-  rows.forEach(m=>{
-    if(!m.dlCode) return;
-    const realE=tlRealTimes[m.id+'_e'];
-    if(!realE||m.autoEnd==null) return;
-    const rm=parseTime(realE);
-    if(rm==null) return;
-    const delta=rm-m.autoEnd;
-    if(delta>0) suggestions.push({code:m.dlCode,name:m.name,desc:m.dlDesc,delta,wing:m.wing});
-  });
-  if(!suggestions.length){panel.style.display='none';return;}
-  panel.style.display='block';
-  list.innerHTML=suggestions.map(s=>{
-    const wingTag=s.wing==='above'?'☝':'👇';
-    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.12);border-radius:var(--radius-sm)">
-      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--red);min-width:36px;text-align:center">${s.code}</span>
-      <div style="flex:1">
-        <div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">${wingTag} ${s.name}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim)">${s.desc}</div>
-      </div>
-      <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red)">+${s.delta}m</span>
-    </div>`;
-  }).join('');
-}
-
-function tlSetReal(key,val){
-  const parsed=parseTime(val);
-  if(val.trim()===''||val==='--:--'){delete tlRealTimes[key];}
-  else if(parsed!=null){tlRealTimes[key]=fmtTime(parsed);}
-  else{tlRealTimes[key]=val;}
-  saveTlState();renderTimeline();
-}
-
-function tlSetAuto(key,val){
-  const parsed=parseTime(val);
-  if(val.trim()===''||val==='--:--'){delete tlAutoOverrides[key];}
-  else if(parsed!=null){tlAutoOverrides[key]=fmtTime(parsed);}
-  else{tlAutoOverrides[key]=val;}
-  saveTlState();renderTimeline();
-}
-
-function tlAutoFmt(el){
-  const v=el.value.replace(':','');
-  if(v.length===4&&/^\d{4}$/.test(v)) el.value=v.slice(0,2)+':'+v.slice(2);
-}
-
-function addCustomMilestone(){
-  const name=prompt("Nom de l'action :");
-  if(!name) return;
-  const wing=confirm("Above the wing (passagers) ?\n\nOK = Above\nAnnuler = Below (piste)")?'above':'below';
-  customMilestones.push({id:'cust-'+Date.now(),name,wing,sortKey:4000+customMilestones.length});
-  saveTlState();renderTimeline();
-}
-
-function removeCustomMilestone(id){
-  customMilestones=customMilestones.filter(m=>m.id!==id);
-  delete tlRealTimes[id+'_s'];delete tlRealTimes[id+'_e'];
-  delete tlAutoOverrides[id+'_s'];delete tlAutoOverrides[id+'_e'];
-  saveTlState();renderTimeline();
+function toggleTheme(){
+  const dark=!document.body.classList.contains('dark');
+  try{localStorage.setItem('dl_theme',dark?'dark':'light');}catch(e){}
+  applyDarkMode(dark);
 }
 
 // ── TIME CALCULATOR ──────────────────────────────────────────────────
@@ -2960,7 +2484,7 @@ function getTodayDDMM(){ const d=new Date(); return p2(d.getDate())+'/'+p2(d.get
   const now=new Date();
   document.getElementById('sessionInfo').textContent=
     p2(now.getHours())+':'+p2(now.getMinutes());
-  startRotationTimer();
+  try{ applyDarkMode(localStorage.getItem('dl_theme')==='dark'); }catch(e){ applyDarkMode(false); }
 })();
 </script>
 </body>
