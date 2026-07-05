@@ -593,6 +593,39 @@
   .btn-copy { background:rgba(93,173,226,.15); border:1px solid var(--accent); color:var(--accent); font-family:var(--mono); font-size:11px; letter-spacing:1px; padding:8px 18px; border-radius:var(--radius-sm); cursor:pointer; transition:all .2s; }
   .btn-copy:hover { background:rgba(93,173,226,.3); }
 
+  /* ── FEUILLES DE VOL ── */
+  #sheets-bar { display:flex; gap:5px; max-width:960px; margin:0 auto 6px; align-items:center; overflow-x:auto; -webkit-overflow-scrolling:touch; padding:2px; }
+  #sheets-bar::-webkit-scrollbar { display:none; }
+  .sheet-chip { display:flex; align-items:center; gap:6px; padding:5px 11px; border-radius:20px; border:1px solid var(--border); background:var(--bg2); font-family:var(--mono); font-size:10px; font-weight:700; color:var(--text-dim); cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .2s; box-shadow:var(--shadow-sm); }
+  .sheet-chip.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .sheet-chip .sheet-x { font-size:11px; opacity:.6; padding:0 2px; }
+  .sheet-chip .sheet-x:active { opacity:1; }
+  .sheet-add { width:26px; height:26px; border-radius:50%; border:1px dashed var(--border); background:var(--bg2); color:var(--accent); font-size:14px; font-weight:700; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+
+  /* ── TIMELINE STD (jalons fixes) ── */
+  #std-timeline { margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); }
+  .stl-wrap { position:relative; height:66px; }
+  .stl-track { position:absolute; top:34px; left:0; right:0; height:4px; background:var(--bg3); border-radius:2px; }
+  body.dark .stl-track { background:var(--border); }
+  .stl-fill { position:absolute; top:34px; left:0; height:4px; border-radius:2px; background:linear-gradient(90deg,var(--accent3),var(--accent)); transition:width 1s linear; }
+  .stl-dot { position:absolute; top:31px; width:10px; height:10px; border-radius:50%; background:var(--bg2); border:2px solid var(--text-dim); transform:translateX(-50%); z-index:2; }
+  .stl-dot.passed { background:var(--accent3); border-color:var(--accent3); }
+  .stl-dot.next { border-color:var(--accent); animation:stlPulse 2s infinite; }
+  .stl-dot.std { width:13px; height:13px; top:29px; border-width:2.5px; border-color:var(--accent); }
+  .stl-dot.std.passed { background:var(--accent); border-color:var(--accent); }
+  .stl-time { position:absolute; top:14px; transform:translateX(-50%); font-family:var(--mono); font-size:10px; color:var(--text-dim); white-space:nowrap; }
+  .stl-label { position:absolute; top:48px; transform:translateX(-50%); font-family:var(--cond); font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--text-dim); white-space:nowrap; }
+  .stl-time.passed, .stl-label.passed { color:var(--accent3); }
+  .stl-time.next, .stl-label.next { color:var(--accent); }
+  .stl-time.shifted:not(.passed), .stl-label.shifted:not(.passed) { color:var(--accent2); }
+  .stl-dot.shifted:not(.passed) { border-color:var(--accent2); }
+  .stl-left { transform:translateX(0) !important; }
+  .stl-right { transform:translateX(-100%) !important; }
+  .stl-cursor { position:absolute; top:24px; height:24px; width:2px; background:var(--red); transform:translateX(-50%); border-radius:1px; transition:left 1s linear; z-index:3; }
+  .stl-cursor::before { content:''; position:absolute; top:-4px; left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:var(--red); }
+  .stl-now { position:absolute; top:0; transform:translateX(-50%); font-family:var(--mono); font-size:9px; font-weight:700; color:#fff; background:var(--red); padding:1px 7px; border-radius:8px; transition:left 1s linear; letter-spacing:.5px; z-index:3; }
+  @keyframes stlPulse { 0%,100%{ box-shadow:0 0 0 3px rgba(47,107,222,.2);} 50%{ box-shadow:0 0 0 7px rgba(47,107,222,.06);} }
+
   /* ── QUICK SEARCH OVERLAY (code DL from calc) ── */
   .quick-search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:150; }
   .quick-search-overlay.open { display:block; }
@@ -745,6 +778,9 @@
 <!-- ══ TAB: CALCULATEUR ══ -->
 <div class="tab-content active" id="tab-calc">
 
+  <!-- FEUILLES DE VOL -->
+  <div id="sheets-bar"></div>
+
   <!-- QUICK CONTACTS -->
   <div style="display:flex;gap:4px;max-width:960px;margin:0 auto 4px;align-items:center">
     <button class="preset-btn fw" id="btn-fw" onclick="toggleFirstwave()" style="font-size:11px;padding:6px 10px">🌅 First</button>
@@ -814,6 +850,8 @@
           <div class="field"><span class="field-sigle">ATD</span><input type="text" id="atd" placeholder="--:--" maxlength="5" inputmode="numeric"></div>
         </div>
       </div>
+      <!-- TIMELINE STD (jalons fixes) -->
+      <div id="std-timeline" style="display:none"></div>
     </div>
   </div>
 
@@ -940,6 +978,94 @@
 <script>
 // ── STORAGE KEYS ──────────────────────────────────────────────────────
 const KEY_CURRENT = 'dl_current';
+
+// ── MULTI-FEUILLES (suivi de plusieurs vols) ─────────────────────────
+const KEY_SHEETS='dl_sheets';
+let sheets=[]; let activeSheetId=null;
+
+function sheetKey(id){ return 'dl_current_'+id; }
+function currentKey(){ return activeSheetId?sheetKey(activeSheetId):KEY_CURRENT; }
+
+function loadSheets(){
+  try{
+    const s=localStorage.getItem(KEY_SHEETS);
+    if(s){ const d=JSON.parse(s); sheets=d.sheets||[]; activeSheetId=d.active||null; }
+  }catch(e){}
+  if(!sheets.length){ sheets=[{id:Date.now()}]; activeSheetId=sheets[0].id; saveSheets(); }
+  if(!sheets.find(x=>x.id===activeSheetId)){ activeSheetId=sheets[0].id; saveSheets(); }
+  // Migration : ancienne clé unique → première feuille
+  try{
+    const old=localStorage.getItem(KEY_CURRENT);
+    if(old && !localStorage.getItem(sheetKey(activeSheetId))){
+      localStorage.setItem(sheetKey(activeSheetId), old);
+      localStorage.removeItem(KEY_CURRENT);
+    }
+  }catch(e){}
+}
+function saveSheets(){ try{localStorage.setItem(KEY_SHEETS,JSON.stringify({sheets,active:activeSheetId}));}catch(e){} }
+
+function sheetLabel(s,i){
+  if(s.id===activeSheetId){
+    const v=document.getElementById('vol-num').value.trim();
+    return v||('Vol '+(i+1));
+  }
+  try{
+    const raw=localStorage.getItem(sheetKey(s.id));
+    if(raw){ const d=JSON.parse(raw); if(d.volNum&&d.volNum.trim()) return d.volNum.trim(); }
+  }catch(e){}
+  return 'Vol '+(i+1);
+}
+
+function renderSheetsBar(){
+  const bar=document.getElementById('sheets-bar');
+  if(!bar) return;
+  bar.innerHTML=sheets.map((s,i)=>{
+    const act=s.id===activeSheetId;
+    return `<div class="sheet-chip ${act?'active':''}" onclick="switchSheet(${s.id})">
+      <span>✈ ${sheetLabel(s,i)}</span>
+      ${sheets.length>1?`<span class="sheet-x" onclick="closeSheet(${s.id},event)">✕</span>`:''}
+    </div>`;
+  }).join('')+`<button class="sheet-add" onclick="addSheet()" title="Nouvelle feuille">＋</button>`;
+}
+
+async function switchSheet(id){
+  if(id===activeSheetId) return;
+  await autoSave();
+  activeSheetId=id; saveSheets();
+  clearSheetUI(); lastCalc={};
+  await restoreCurrent();
+  calcAll();
+  renderSheetsBar();
+}
+
+async function addSheet(){
+  await autoSave();
+  const id=Date.now();
+  sheets.push({id});
+  activeSheetId=id; saveSheets();
+  clearSheetUI(); lastCalc={};
+  calcAll();
+  renderSheetsBar();
+  showToast('✈ Nouvelle feuille');
+}
+
+function closeSheet(id,ev){
+  if(ev) ev.stopPropagation();
+  if(sheets.length<=1){ showToast('Dernière feuille — impossible de fermer'); return; }
+  if(!confirm('Fermer cette feuille de vol ?')) return;
+  try{localStorage.removeItem(sheetKey(id));}catch(e){}
+  const idx=sheets.findIndex(x=>x.id===id);
+  sheets=sheets.filter(x=>x.id!==id);
+  if(id===activeSheetId){
+    activeSheetId=sheets[Math.max(0,idx-1)].id;
+    saveSheets();
+    clearSheetUI(); lastCalc={};
+    restoreCurrent().then(()=>{calcAll();renderSheetsBar();});
+  } else {
+    saveSheets();
+    renderSheetsBar();
+  }
+}
 const KEY_HISTORY = 'dl_history';
 const KEY_SORT    = 'dl_sort';
 
@@ -1708,6 +1834,7 @@ function calcAll(){
     if(ata===null && chronoInterval){clearInterval(chronoInterval);chronoInterval=null;document.getElementById('live-widget').classList.remove('active');}
 
     autoSave();
+    renderStdTimeline();
   } catch(e){console.warn('Calc error:',e);}
 }
 
@@ -1733,7 +1860,7 @@ async function autoSave(){
       firstwave:firstwave,
       lastwave:lastwave
     };
-    try{ await window.storage.set(KEY_CURRENT, JSON.stringify(state)); flashSave(); } catch(e){}
+    try{ await window.storage.set(currentKey(), JSON.stringify(state)); flashSave(); renderSheetsBar(); } catch(e){}
   } catch(e){}
 }
 
@@ -1749,7 +1876,7 @@ function flashSave(){
 // ── RESTORE CURRENT ───────────────────────────────────────────────────
 async function restoreCurrent(){
   let r;
-  try{ r=await window.storage.get(KEY_CURRENT); } catch(e){ return; } // clé absente = première ouverture
+  try{ r=await window.storage.get(currentKey()); } catch(e){ return; } // clé absente = première ouverture
   if(!r||!r.value) return;
   try{
     const s=JSON.parse(r.value);
@@ -1987,7 +2114,7 @@ async function clearHistory(){
 }
 
 // ── RESET ─────────────────────────────────────────────────────────────
-function resetAll(){
+function clearSheetUI(){
   ['sta','ata','ado','std','adct','adc','atd','ctot'].forEach(id=>{
     const el=document.getElementById(id);
     el.value=''; el.classList.remove('error','valid');
@@ -2014,14 +2141,16 @@ function resetAll(){
   document.getElementById('actype-bar').style.display='none';
   applyTheme();
 
-
   // Hide computed fields & widget
   document.getElementById('field-ptd').style.display='none';
   document.getElementById('field-adct-calc').style.display='none';
   document.getElementById('field-ttm-prevu').style.display='none';
   document.getElementById('live-widget').classList.remove('active');
   if(chronoInterval){clearInterval(chronoInterval);chronoInterval=null;}
+}
 
+function resetAll(){
+  clearSheetUI();
   lastCalc={};
   calcAll();
 }
@@ -2212,6 +2341,68 @@ function toggleTheme(){
   const dark=!document.body.classList.contains('dark');
   try{localStorage.setItem('dl_theme',dark?'dark':'light');}catch(e){}
   applyDarkMode(dark);
+}
+
+// ── TIMELINE STD (jalons fixes départ) ────────────────────────────────
+const STD_MILESTONES={
+  ezy:[{off:-40,label:'Pile 1'},{off:-20,label:'CHK'}],
+  vly:[{off:-60,label:'PDC'},{off:-40,label:'CHK'},{off:-20,label:'EMB',adaptive:true}]
+};
+let stdTlInterval=null;
+
+function renderStdTimeline(){
+  const box=document.getElementById('std-timeline');
+  if(!box) return;
+  const std=parseTime(document.getElementById('std').value);
+  if(!activePreset||std===null||lastwave){box.style.display='none';box.innerHTML='';return;}
+
+  // PTD local pour le jalon EMB adaptatif (EMB = PTD - 20)
+  const ata=parseTime(document.getElementById('ata').value);
+  const ttmEff=parseInt(document.getElementById('ttm').value)||null;
+  let ptd=std;
+  if(ata!==null&&ttmEff!==null) ptd=Math.max(ata+ttmEff,std);
+
+  const ms=STD_MILESTONES[activePreset]||[];
+  const pts=ms.map(m=>{
+    const base=m.adaptive?ptd:std;
+    return {t:base+m.off,label:m.label,shifted:!!(m.adaptive&&ptd>std)};
+  });
+  pts.push({t:std,label:'STD',isStd:true});
+  pts.sort((a,b)=>a.t-b.t);
+
+  const start=pts[0].t;
+  const endT=pts[pts.length-1].t;
+  const range=(endT-start)||1;
+
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
+  const prog=Math.max(0,Math.min(1,(nowMin-start)/range));
+  const nextIdx=pts.findIndex(p=>nowMin<p.t);
+
+  let html='<div class="stl-wrap">';
+  html+='<div class="stl-track"></div>';
+  html+=`<div class="stl-fill" style="width:${prog*100}%"></div>`;
+  pts.forEach((p,i)=>{
+    const x=(p.t-start)/range*100;
+    const passed=nowMin>=p.t;
+    const cls=(passed?'passed':'')+(i===nextIdx?' next':'')+(p.shifted?' shifted':'');
+    const anchor=i===0?'stl-left':(i===pts.length-1?'stl-right':'');
+    html+=`<div class="stl-time ${anchor} ${cls}" style="left:${x}%">${fmtTime(p.t)}</div>`;
+    html+=`<div class="stl-dot ${cls} ${p.isStd?'std':''}" style="left:${x}%"></div>`;
+    html+=`<div class="stl-label ${anchor} ${cls}" style="left:${x}%">${passed?'✓ ':''}${p.label}</div>`;
+  });
+  const nowAnchor=prog<0.1?'stl-left':(prog>0.9?'stl-right':'');
+  html+=`<div class="stl-cursor" style="left:${prog*100}%"></div>`;
+  html+=`<div class="stl-now ${nowAnchor}" style="left:${prog*100}%">${p2(now.getHours())}:${p2(now.getMinutes())}</div>`;
+  html+='</div>';
+
+  box.style.display='block';
+  box.innerHTML=html;
+}
+
+function startStdTlTimer(){
+  if(stdTlInterval) clearInterval(stdTlInterval);
+  stdTlInterval=setInterval(renderStdTimeline,1000);
 }
 
 // ── TIME CALCULATOR ──────────────────────────────────────────────────
@@ -2413,7 +2604,7 @@ async function exportData(){
       history:[],
       codes:[]
     };
-    try{const r=await window.storage.get(KEY_CURRENT);if(r&&r.value) data.current=JSON.parse(r.value);}catch(e){}
+    try{const r=await window.storage.get(currentKey());if(r&&r.value) data.current=JSON.parse(r.value);}catch(e){}
     try{const r=await window.storage.get(KEY_HISTORY);if(r&&r.value) data.history=JSON.parse(r.value);}catch(e){}
     try{const r=await window.storage.get(KEY_CODES);if(r&&r.value) data.codes=JSON.parse(r.value);}catch(e){}
 
@@ -2439,7 +2630,7 @@ async function importData(event){
 
     let imported=0;
     if(data.current){
-      await window.storage.set(KEY_CURRENT,JSON.stringify(data.current));
+      await window.storage.set(currentKey(),JSON.stringify(data.current));
       imported++;
     }
     if(data.history&&data.history.length){
@@ -2478,13 +2669,16 @@ function getTodayDDMM(){ const d=new Date(); return p2(d.getDate())+'/'+p2(d.get
   document.getElementById('btn-fw').style.pointerEvents='none';
   document.getElementById('btn-lw').style.opacity='0.3';
   document.getElementById('btn-lw').style.pointerEvents='none';
+  loadSheets();
   await restoreCurrent();
+  renderSheetsBar();
   // Pre-fill date if empty
   if(!document.getElementById('vol-date').value) document.getElementById('vol-date').value=getTodayDDMM();
   const now=new Date();
   document.getElementById('sessionInfo').textContent=
     p2(now.getHours())+':'+p2(now.getMinutes());
   try{ applyDarkMode(localStorage.getItem('dl_theme')==='dark'); }catch(e){ applyDarkMode(false); }
+  startStdTlTimer();
 })();
 </script>
 </body>
