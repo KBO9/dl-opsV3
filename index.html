@@ -772,6 +772,7 @@
 <div class="tabs" style="max-width:960px;margin:0 auto 0;">
   <button class="tab-btn active" onclick="switchTab('calc')">⚙️ <span class="tab-label">Calcul</span></button>
   <button class="tab-btn" onclick="switchTab('timecalc')">🕐 <span class="tab-label">Temps</span></button>
+  <button class="tab-btn" onclick="switchTab('notes')">📝 <span class="tab-label">Notes</span></button>
   <button class="tab-btn" onclick="switchTab('history')">🗄️ <span class="tab-label">Hist.</span></button>
 </div>
 
@@ -936,6 +937,24 @@
 </div>
 </div><!-- end tab-timecalc -->
 
+<!-- ══ TAB: NOTES ══ -->
+<div class="tab-content" id="tab-notes">
+<div style="max-width:960px;margin:0 auto">
+  <div class="panel">
+    <div class="panel-head" style="cursor:default">
+      <span class="icon">📝</span><span class="title">Notes vol</span>
+      <span id="notes-vol-tag" style="margin-left:8px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent)"></span>
+      <button class="btn-copy" onclick="insertNoteTime()" style="font-size:9px;padding:4px 10px;margin-left:auto">🕐 Heure</button>
+      <button class="btn-reset" onclick="clearNotes()" style="font-size:9px;padding:4px 10px">🗑</button>
+    </div>
+    <div class="panel-body" style="padding:8px">
+      <textarea id="notes-area" placeholder="Notes libres pendant la rotation…&#10;Astuce : le bouton 🕐 insère l'heure courante." oninput="saveNotes()" style="width:100%;min-height:55vh;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-bright);font-family:var(--mono);font-size:13px;line-height:1.5;padding:10px;outline:none;resize:vertical;text-align:left;letter-spacing:0"></textarea>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--text-dim)"><span>Sauvegarde auto · liée à la feuille</span><span id="notes-count"></span></div>
+    </div>
+  </div>
+</div>
+</div><!-- end tab-notes -->
+
 <!-- ══ TAB: HISTORIQUE ══ -->
 <div class="tab-content" id="tab-history">
 <div class="history-wrap">
@@ -1036,6 +1055,7 @@ async function switchSheet(id){
   await restoreCurrent();
   calcAll();
   renderSheetsBar();
+  refreshNotesUI();
 }
 
 async function addSheet(){
@@ -1046,6 +1066,7 @@ async function addSheet(){
   clearSheetUI(); lastCalc={};
   calcAll();
   renderSheetsBar();
+  refreshNotesUI();
   showToast('✈ Nouvelle feuille');
 }
 
@@ -1054,13 +1075,14 @@ function closeSheet(id,ev){
   if(sheets.length<=1){ showToast('Dernière feuille — impossible de fermer'); return; }
   if(!confirm('Fermer cette feuille de vol ?')) return;
   try{localStorage.removeItem(sheetKey(id));}catch(e){}
+  try{localStorage.removeItem('dl_notes_'+id);}catch(e){}
   const idx=sheets.findIndex(x=>x.id===id);
   sheets=sheets.filter(x=>x.id!==id);
   if(id===activeSheetId){
     activeSheetId=sheets[Math.max(0,idx-1)].id;
     saveSheets();
     clearSheetUI(); lastCalc={};
-    restoreCurrent().then(()=>{calcAll();renderSheetsBar();});
+    restoreCurrent().then(()=>{calcAll();renderSheetsBar();refreshNotesUI();});
   } else {
     saveSheets();
     renderSheetsBar();
@@ -1100,10 +1122,11 @@ function p2(v){ return String(v).padStart(2,'0'); }
 
 // ── TABS ──────────────────────────────────────────────────────────────
 function switchTab(name) {
-  const tabs=['calc','timecalc','history'];
+  const tabs=['calc','timecalc','notes','history'];
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', tabs[i]===name));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active', c.id==='tab-'+name));
   if(name==='history') renderHistory();
+  if(name==='notes') refreshNotesUI();
   window.scrollTo({top:0,behavior:'smooth'});
   currentTab=name;
 }
@@ -2151,6 +2174,8 @@ function clearSheetUI(){
 
 function resetAll(){
   clearSheetUI();
+  try{ localStorage.removeItem(notesKey()); }catch(e){}
+  const ta=document.getElementById('notes-area'); if(ta){ ta.value=''; updateNotesMeta(); }
   lastCalc={};
   calcAll();
 }
@@ -2307,7 +2332,7 @@ function applyQuickCode(code,desc){
 // ── SWIPE BETWEEN TABS ───────────────────────────────────────────────
 let currentTab='calc';
 let touchStartX=0, touchStartY=0;
-const TAB_ORDER=['calc','timecalc','history'];
+const TAB_ORDER=['calc','timecalc','notes','history'];
 
 document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
 document.addEventListener('touchend',e=>{
@@ -2403,6 +2428,44 @@ function renderStdTimeline(){
 function startStdTlTimer(){
   if(stdTlInterval) clearInterval(stdTlInterval);
   stdTlInterval=setInterval(renderStdTimeline,1000);
+}
+
+// ── NOTES PAR FEUILLE ────────────────────────────────────────────────
+function notesKey(){ return 'dl_notes_'+activeSheetId; }
+
+function refreshNotesUI(){
+  const ta=document.getElementById('notes-area'); if(!ta) return;
+  let v=''; try{ v=localStorage.getItem(notesKey())||''; }catch(e){}
+  ta.value=v;
+  updateNotesMeta();
+}
+function updateNotesMeta(){
+  const ta=document.getElementById('notes-area');
+  const tag=document.getElementById('notes-vol-tag');
+  const cnt=document.getElementById('notes-count');
+  if(tag){ const v=document.getElementById('vol-num').value.trim(); tag.textContent=v?('✈ '+v):''; }
+  if(cnt&&ta) cnt.textContent=ta.value.length?(ta.value.length+' car.'):'';
+}
+function saveNotes(){
+  const ta=document.getElementById('notes-area'); if(!ta) return;
+  try{ localStorage.setItem(notesKey(), ta.value); }catch(e){}
+  updateNotesMeta();
+}
+function insertNoteTime(){
+  const ta=document.getElementById('notes-area'); if(!ta) return;
+  const n=new Date();
+  const stamp=(ta.value&&!ta.value.endsWith('\n')?'\n':'')+p2(n.getHours())+':'+p2(n.getMinutes())+' — ';
+  const pos=(ta.selectionStart!=null)?ta.selectionStart:ta.value.length;
+  ta.value=ta.value.slice(0,pos)+stamp+ta.value.slice(pos);
+  const np=pos+stamp.length;
+  ta.focus(); ta.setSelectionRange(np,np);
+  saveNotes();
+}
+function clearNotes(){
+  if(!confirm('Effacer les notes de cette feuille ?')) return;
+  const ta=document.getElementById('notes-area'); if(ta) ta.value='';
+  try{ localStorage.removeItem(notesKey()); }catch(e){}
+  updateNotesMeta();
 }
 
 // ── TIME CALCULATOR ──────────────────────────────────────────────────
